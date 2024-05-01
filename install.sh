@@ -34,7 +34,7 @@ mkdir -p "/home/$USER/client-configs/files"
 cp "$CURRENT_DIRECTORY/configs/openvpn_client_base.conf" "/home/$USER/client-configs"
 substitute_variables "/home/$USER/client-configs/openvpn_client_base.conf"
 
-sudo cp "$CURRENT_DIRECTORY/configs/openvpn_server.con" /etc/openvpn/server/server.conf
+sudo cp "$CURRENT_DIRECTORY/configs/openvpn_server.conf" /etc/openvpn/server/server.conf
 
 sudo sed -i 's/#net.ipv4.ip_forward = 1/net.ipv4.ip_forward = 1/g' /etc/sysctl.conf
 sudo sysctl -p
