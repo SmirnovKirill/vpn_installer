@@ -1,20 +1,21 @@
-#!/bin/bash
+#!/bin/sh
 
 set -ex
 
-source "~/vpn_installer/functions.sh"
-source "~/vpn_installer/constants.sh"
+source "$HOME/vpn_installer/variables.sh"
+source "$HOME/vpn_installer/functions.sh"
+source "$HOME/vpn_installer/constants.sh"
 
-cd ~/easy-rsa
+cd "$HOME/easy-rsa"
 /usr/share/easy-rsa/easyrsa gen-req ${1} nopass
-cp ~/easy-rsa/pki/private/${1}.key ~/client-configs/keys/
+cp "$HOME/easy-rsa/pki/private/${1}.key" "$HOME/client-configs/keys/"
 /usr/share/easy-rsa/easyrsa sign-req client ${1}
-cp ~/easy-rsa/pki/issued/${1}.crt ~/client-configs/keys/
-cd ~
+cp "$HOME/easy-rsa/pki/issued/${1}.crt" "$HOME/client-configs/keys/"
+cd "$HOME"
 
-KEY_DIR=~/client-configs/keys
-OUTPUT_DIR=~/client-configs/files
-BASE_CONFIG=~/client-configs/openvpn_client_base.conf
+KEY_DIR="$HOME/client-configs/keys"
+OUTPUT_DIR="$HOME/client-configs/files"
+BASE_CONFIG="$HOME/client-configs/openvpn_client_base.conf"
 
 cat ${BASE_CONFIG} \
     <(echo -e '<ca>') \
@@ -35,7 +36,7 @@ echo $OPENVPN_CLIENT_CONFIG_ESCAPED
 read CK_CLIENT_USER_UID <<< $(/usr/bin/ck-server -uid | awk -F ":" '{print $2}' | sed -e $SED_COLOR_CODES_REPLACE | sed 's/ //g')
 CK_CLIENT_USER_UID=$(escape_variable_for_sed $CK_CLIENT_USER_UID)
 
-AMNEZIA_TEMPLATE=$(cat ~/client-configs/amnezia_template.json \
+AMNEZIA_TEMPLATE=$(cat "$HOME/client-configs/amnezia_template.json" \
   | sed "s/\$CK_CLIENT_USER_UID/$CK_CLIENT_USER_UID/g" \
   | sed "s/\$OPENVPN_CLIENT_CONFIG_ESCAPED/$OPENVPN_CLIENT_CONFIG_ESCAPED_FOR_SED/g" \
   | sed "s/\$AMNEZIA_CONTAINER_NAME/$1/g")

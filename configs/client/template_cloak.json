@@ -1,0 +1,13 @@
+{
+  "BrowserSig": "chrome",
+  "EncryptionMethod": "aes-gcm",
+  "NumConn": 1,
+  "ProxyMethod": "openvpn",
+  "PublicKey": "$CK_SERVER_PUBLIC_KEY",
+  "RemoteHost": "$VPS_IP",
+  "RemotePort": "443",
+  "ServerName": "$CLOAK_FAKE_HOST",
+  "StreamTimeout": 300,
+  "Transport": "direct",
+  "UID": "$CK_USER_UID"
+}
