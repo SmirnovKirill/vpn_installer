@@ -10,7 +10,7 @@
   ],
   "BypassUID": [
   ],
-  "RedirAddr": "ya.ru",
+  "RedirAddr": "$CLOAK_FAKE_HOST",
   "PrivateKey": "$CK_SERVER_PRIVATE_KEY",
   "AdminUID": "$CK_CLIENT_ADMIN_UID",
   "DatabasePath": "userinfo.db"

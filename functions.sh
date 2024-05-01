@@ -14,6 +14,7 @@ function substitute_variables {
   local CK_CLIENT_ADMIN_UID_ESCAPED=$(escape_variable_for_sed $CK_CLIENT_ADMIN_UID)
   sudo -u $USER_TO_PERFORM sed -i "s/\$USER/$USER/g" $1
   sudo -u $USER_TO_PERFORM sed -i "s/\$VPS_IP/$VPS_IP/g" $1
+  sudo -u $USER_TO_PERFORM sed -i "s/\$CLOAK_FAKE_HOST/$CLOAK_FAKE_HOST/g" $1
   sudo -u $USER_TO_PERFORM sed -i "s/\$CK_SERVER_PUBLIC_KEY/$CK_SERVER_PUBLIC_KEY_ESCAPED/g" $1
   sudo -u $USER_TO_PERFORM sed -i "s/\$CK_SERVER_PRIVATE_KEY/$CK_SERVER_PRIVATE_KEY_ESCAPED/g" $1
   sudo -u $USER_TO_PERFORM sed -i "s/\$CK_CLIENT_ADMIN_UID/$CK_CLIENT_ADMIN_UID_ESCAPED/g" $1

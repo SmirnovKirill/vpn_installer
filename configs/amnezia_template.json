@@ -1,0 +1,23 @@
+{
+  "containers": [
+    {
+      "container": "amnezia-openvpn-cloak",
+      "openvpn": {
+        "last_config": "{\n    \"clientId\": \"clientId\",\n    \"config\": \"$OPENVPN_CLIENT_CONFIG_ESCAPED\"}\n"
+      },
+      "cloak": {
+        "last_config": "{\n    \"BrowserSig\": \"chrome\",\n    \"EncryptionMethod\": \"aes-gcm\",\n    \"NumConn\": 1,\n    \"ProxyMethod\": \"openvpn\",\n    \"PublicKey\": \"$CK_SERVER_PUBLIC_KEY\",\n    \"RemoteHost\": \"$VPS_IP\",\n    \"RemotePort\": \"443\",\n    \"ServerName\": \"$CLOAK_FAKE_HOST\",\n    \"StreamTimeout\": 300,\n    \"Transport\": \"direct\",\n    \"UID\": \"$CK_CLIENT_USER_UID\"\n}\n",
+        "port": "443",
+        "transport_proto": "tcp"
+      },
+      "shadowsocks": {
+        "last_config": "{\n    \"local_port\": \"8585\",\n    \"method\": \"chacha20-ietf-poly1305\",\n    \"password\": \"password\",\n    \"server\": \"$VPS_IP\",\n    \"server_port\": \"6789\",\n    \"timeout\": 60\n}\n"
+      }
+    }
+  ],
+  "defaultContainer": "amnezia-openvpn-cloak",
+  "description": "$AMNEZIA_CONTAINER_NAME",
+  "dns1": "208.67.222.222",
+  "dns2": "208.67.220.220",
+  "hostName": "$VPS_IP"
+}

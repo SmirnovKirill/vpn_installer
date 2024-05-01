@@ -1,5 +1,10 @@
 #!/bin/bash
 
+set -ex
+
+source "~/vpn_installer/functions.sh"
+source "~/vpn_installer/constants.sh"
+
 cd ~/easy-rsa
 /usr/share/easy-rsa/easyrsa gen-req ${1} nopass
 cp ~/easy-rsa/pki/private/${1}.key ~/client-configs/keys/
@@ -22,3 +27,16 @@ cat ${BASE_CONFIG} \
     ${KEY_DIR}/ta.key \
     <(echo -e '</tls-crypt>') \
     > ${OUTPUT_DIR}/${1}.ovpn
+
+OPENVPN_CLIENT_CONFIG_ESCAPED=$(cat ${OUTPUT_DIR}/${1}.ovpn | sed -z 's/\n/\\n/g')
+OPENVPN_CLIENT_CONFIG_ESCAPED_FOR_SED=$(escape_variable_for_sed $OPENVPN_CLIENT_CONFIG_ESCAPED)
+echo $OPENVPN_CLIENT_CONFIG_ESCAPED
+
+read CK_CLIENT_USER_UID <<< $(/usr/bin/ck-server -uid | awk -F ":" '{print $2}' | sed -e $SED_COLOR_CODES_REPLACE | sed 's/ //g')
+CK_CLIENT_USER_UID=$(escape_variable_for_sed $CK_CLIENT_USER_UID)
+
+AMNEZIA_TEMPLATE=$(cat ~/client-configs/amnezia_template.json \
+  | sed "s/\$CK_CLIENT_USER_UID/$CK_CLIENT_USER_UID/g" \
+  | sed "s/\$OPENVPN_CLIENT_CONFIG_ESCAPED/$OPENVPN_CLIENT_CONFIG_ESCAPED_FOR_SED/g" \
+  | sed "s/\$AMNEZIA_CONTAINER_NAME/$1/g")
+echo $AMNEZIA_TEMPLATE

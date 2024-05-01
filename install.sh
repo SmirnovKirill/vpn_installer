@@ -2,13 +2,12 @@
 
 set -ex
 
-CURRENT_DIRECTORY="$(dirname "$0")"
 source "$CURRENT_DIRECTORY/variables.sh"
 CK_SERVER_PUBLIC_KEY=""
 CK_SERVER_PRIVATE_KEY=""
 CK_CLIENT_ADMIN_UID=""
-NON_BASE64_REGEXP="[^a-zA-Z0-9+=\/]"
 source "$CURRENT_DIRECTORY/functions.sh"
+source "$CURRENT_DIRECTORY/constants.sh"
 
 sudo apt update
 sudo apt install openvpn easy-rsa
@@ -34,6 +33,11 @@ mkdir -p "/home/$USER/client-configs/keys"
 mkdir -p "/home/$USER/client-configs/files"
 cp "$CURRENT_DIRECTORY/configs/openvpn_client_base.conf" "/home/$USER/client-configs"
 substitute_variables "/home/$USER/client-configs/openvpn_client_base.conf"
+cp "$CURRENT_DIRECTORY/scripts/make_client_config.sh" "/home/$USER/client-configs"
+sudo cp "/home/$USER/easy-rsa/ta.key" "/home/$USER/client-configs/keys"
+sudo cp "/home/$USER/easy-rsa/pki/ca.crt" "/home/$USER/client-configs/keys"
+sudo chown $USER "/home/$USER/client-configs/keys/ta.key"
+sudo chown $USER "/home/$USER/client-configs/keys/ca.crt"
 
 sudo cp "$CURRENT_DIRECTORY/configs/openvpn_server.conf" /etc/openvpn/server/server.conf
 
@@ -63,11 +67,14 @@ sudo systemctl start openvpn-server@server.service
 
 
 wget "$CK_SERVER_URL" -O "/home/$USER/ck-server"
-chmod +x ck-server "/home/$USER/ck-server"
+chmod +x "/home/$USER/ck-server"
 sudo mv "/home/$USER/ck-server" /usr/bin/ck-server
 
-read CK_SERVER_PUBLIC_KEY CK_SERVER_PRIVATE_KEY <<< $(/usr/bin/ck-server -key | awk -F ":" '{print $2}' | sed 's/$NON_BASE64_REGEXP//g' | tr '\n' ' ')
-read CK_CLIENT_ADMIN_UID <<< $(/usr/bin/ck-server -uid | awk -F ":" '{print $2}' | sed 's/$NON_BASE64_REGEXP//g')
+read CK_SERVER_PUBLIC_KEY CK_SERVER_PRIVATE_KEY <<< $(/usr/bin/ck-server -key | awk -F ":" '{print $2}' | sed -e $SED_COLOR_CODES_REPLACE | sed 's/ //g' | tr '\n' ' ')
+read CK_CLIENT_ADMIN_UID <<< $(/usr/bin/ck-server -uid | awk -F ":" '{print $2}' | sed -e $SED_COLOR_CODES_REPLACE | sed 's/ //g')
+
+cp "$CURRENT_DIRECTORY/configs/amnezia_template.json" "/home/$USER/client-configs"
+substitute_variables "/home/$USER/client-configs/amnezia_template.json"
 
 sudo mkdir /etc/cloak
 sudo cp "$CURRENT_DIRECTORY/configs/ckserver.json" /etc/cloak/ckserver.json
