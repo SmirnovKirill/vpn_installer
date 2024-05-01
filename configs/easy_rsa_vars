@@ -1,0 +1,7 @@
+set_var EASYRSA_REQ_COUNTRY    "RU"
+set_var EASYRSA_REQ_CITY       "Moscow"
+set_var EASYRSA_REQ_ORG        "Pupa&Lupa"
+set_var EASYRSA_REQ_EMAIL      "pupaandluoa@accounting.com"
+set_var EASYRSA_REQ_OU         "Accounting"
+set_var EASYRSA_ALGO           "ec"
+set_var EASYRSA_DIGEST         "sha512"
