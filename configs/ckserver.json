@@ -1,0 +1,17 @@
+{
+  "ProxyBook": {
+    "openvpn": [
+      "tcp",
+      "127.0.0.1:1194"
+    ]
+  },
+  "BindAddr": [
+    ":443"
+  ],
+  "BypassUID": [
+  ],
+  "RedirAddr": "ya.ru",
+  "PrivateKey": "$CK_SERVER_PRIVATE_KEY",
+  "AdminUID": "$CK_CLIENT_ADMIN_UID",
+  "DatabasePath": "userinfo.db"
+}

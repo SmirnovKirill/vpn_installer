@@ -1,0 +1,12 @@
+[Unit]
+Description=cloak-server
+After=network.target
+StartLimitIntervalSec=0
+[Service]
+Type=simple
+#Service variables
+Environment=CONFIG="/etc/cloak/ckserver.json"
+ExecStart=/usr/bin/ck-server -c "$CONFIG"
+Restart=always
+[Install]
+WantedBy=multi-user.target

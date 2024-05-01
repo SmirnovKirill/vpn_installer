@@ -4,30 +4,33 @@ set -ex
 
 CURRENT_DIRECTORY="$(dirname "$0")"
 source "$CURRENT_DIRECTORY/variables.sh"
+CK_SERVER_PUBLIC_KEY=""
+CK_SERVER_PRIVATE_KEY=""
+CK_CLIENT_ADMIN_UID=""
 source "$CURRENT_DIRECTORY/functions.sh"
 
 sudo apt update
 sudo apt install openvpn easy-rsa
 
-mkdir /home/$USER/easy-rsa
+mkdir "/home/$USER/easy-rsa"
 cp "$CURRENT_DIRECTORY/configs/easy_rsa_vars" "/home/$USER/easy-rsa/vars"
 
-cd /home/$USER/easy-rsa
+cd "/home/$USER/easy-rsa"
 /usr/share/easy-rsa/easyrsa init-pki
 /usr/share/easy-rsa/easyrsa build-ca nopass
 /usr/share/easy-rsa/easyrsa gen-req server nopass
 /usr/share/easy-rsa/easyrsa sign-req server server
 openvpn --genkey --secret ta.key
 
-cd $CURRENT_DIRECTORY
+cd "$CURRENT_DIRECTORY"
 
-sudo cp /home/$USER/easy-rsa/pki/private/server.key /etc/openvpn/server
-sudo cp /home/$USER/easy-rsa/pki/ca.crt /etc/openvpn/server
-sudo cp /home/$USER/easy-rsa/pki/issued/server.crt /etc/openvpn/server
-sudo cp /home/$USER/easy-rsa/ta.key /etc/openvpn/server
+sudo cp "/home/$USER/easy-rsa/pki/private/server.key" /etc/openvpn/server
+sudo cp "/home/$USER/easy-rsa/pki/ca.crt" /etc/openvpn/server
+sudo cp "/home/$USER/easy-rsa/pki/issued/server.crt" /etc/openvpn/server
+sudo cp "/home/$USER/easy-rsa/ta.key" /etc/openvpn/server
 
-mkdir -p /home/$USER/client-configs/keys
-mkdir -p /home/$USER/client-configs/files
+mkdir -p "/home/$USER/client-configs/keys"
+mkdir -p "/home/$USER/client-configs/files"
 cp "$CURRENT_DIRECTORY/configs/openvpn_client_base.conf" "/home/$USER/client-configs"
 substitute_variables "/home/$USER/client-configs/openvpn_client_base.conf"
 
@@ -36,7 +39,8 @@ sudo cp "$CURRENT_DIRECTORY/configs/openvpn_server.con" /etc/openvpn/server/serv
 sudo sed -i 's/#net.ipv4.ip_forward = 1/net.ipv4.ip_forward = 1/g' /etc/sysctl.conf
 sudo sysctl -p
 
-sudo bash -c 'cat << EndOfText >> /etc/ufw/before.rules
+sudo bash -c "cat << EndOfText >> /etc/ufw/before.rules
+
 # START OPENVPN RULES
 # NAT table rules
 *nat
@@ -45,7 +49,7 @@ sudo bash -c 'cat << EndOfText >> /etc/ufw/before.rules
 -A POSTROUTING -s 10.8.0.0/8 -o $NETWORK_INTERFACE -j MASQUERADE
 COMMIT
 # END OPENVPN RULES
-EndOfText'
+EndOfText"
 
 sudo sed -i 's/DEFAULT_FORWARD_POLICY="DISCARD"/DEFAULT_FORWARD_POLICY="ACCEPT"/g' /etc/default/ufw
 
@@ -54,3 +58,20 @@ sudo ufw allow 443
 
 sudo systemctl -f enable openvpn-server@server.service
 sudo systemctl start openvpn-server@server.service
+
+
+wget "$CK_SERVER_URL" -O "/home/$USER/ck-server"
+chmod +x ck-server "/home/$USER/ck-server"
+sudo mv "/home/$USER/ck-server" /usr/bin/ck-server
+
+read CK_SERVER_PUBLIC_KEY CK_SERVER_PRIVATE_KEY <<< $(/usr/bin/ck-server -key | awk -F ":" '{print $2}' | sed 's/ //g' | tr '\n' ' ')
+read CK_CLIENT_ADMIN_UID <<< $(/usr/bin/ck-server -uid | awk -F ":" '{print $2}' | sed 's/ //g')
+
+sudo mkdir /etc/cloak
+sudo cp "$CURRENT_DIRECTORY/configs/ckserver.json" /etc/cloak/ckserver.json
+substitute_variables /etc/cloak/ckserver.json
+sudo cp "$CURRENT_DIRECTORY/configs/cloak-server.service" /etc/systemd/system/cloak-server.service
+sudo systemctl daemon-reload
+sudo systemctl enable cloak-server.service
+sudo systemctl start cloak-server.service
+sudo systemctl restart openvpn-server@server.service
