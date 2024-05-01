@@ -36,7 +36,7 @@ substitute_variables "/home/$USER/client-configs/openvpn_client_base.conf"
 
 sudo cp "$CURRENT_DIRECTORY/configs/openvpn_server.conf" /etc/openvpn/server/server.conf
 
-sudo sed -i 's/#net.ipv4.ip_forward = 1/net.ipv4.ip_forward = 1/g' /etc/sysctl.conf
+sudo sed -i 's/#net.ipv4.ip_forward=1/net.ipv4.ip_forward=1/g' /etc/sysctl.conf
 sudo sysctl -p
 
 sudo bash -c "cat << EndOfText >> /etc/ufw/before.rules
@@ -51,7 +51,7 @@ COMMIT
 # END OPENVPN RULES
 EndOfText"
 
-sudo sed -i 's/DEFAULT_FORWARD_POLICY="DISCARD"/DEFAULT_FORWARD_POLICY="ACCEPT"/g' /etc/default/ufw
+sudo sed -i 's/DEFAULT_FORWARD_POLICY="DROP"/DEFAULT_FORWARD_POLICY="ACCEPT"/g' /etc/default/ufw
 
 sudo ufw allow OpenSSH
 sudo ufw allow 443
