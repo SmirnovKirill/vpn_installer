@@ -7,6 +7,7 @@ source "$CURRENT_DIRECTORY/variables.sh"
 CK_SERVER_PUBLIC_KEY=""
 CK_SERVER_PRIVATE_KEY=""
 CK_CLIENT_ADMIN_UID=""
+NON_BASE64_REGEXP="[^a-zA-Z0-9+=\/]"
 source "$CURRENT_DIRECTORY/functions.sh"
 
 sudo apt update
@@ -55,6 +56,7 @@ sudo sed -i 's/DEFAULT_FORWARD_POLICY="DROP"/DEFAULT_FORWARD_POLICY="ACCEPT"/g' 
 
 sudo ufw allow OpenSSH
 sudo ufw allow 443
+sudo ufw enable
 
 sudo systemctl -f enable openvpn-server@server.service
 sudo systemctl start openvpn-server@server.service
@@ -64,12 +66,12 @@ wget "$CK_SERVER_URL" -O "/home/$USER/ck-server"
 chmod +x ck-server "/home/$USER/ck-server"
 sudo mv "/home/$USER/ck-server" /usr/bin/ck-server
 
-read CK_SERVER_PUBLIC_KEY CK_SERVER_PRIVATE_KEY <<< $(/usr/bin/ck-server -key | awk -F ":" '{print $2}' | sed 's/ //g' | tr '\n' ' ')
-read CK_CLIENT_ADMIN_UID <<< $(/usr/bin/ck-server -uid | awk -F ":" '{print $2}' | sed 's/ //g')
+read CK_SERVER_PUBLIC_KEY CK_SERVER_PRIVATE_KEY <<< $(/usr/bin/ck-server -key | awk -F ":" '{print $2}' | sed 's/$NON_BASE64_REGEXP//g' | tr '\n' ' ')
+read CK_CLIENT_ADMIN_UID <<< $(/usr/bin/ck-server -uid | awk -F ":" '{print $2}' | sed 's/$NON_BASE64_REGEXP//g')
 
 sudo mkdir /etc/cloak
 sudo cp "$CURRENT_DIRECTORY/configs/ckserver.json" /etc/cloak/ckserver.json
-substitute_variables /etc/cloak/ckserver.json
+substitute_variables /etc/cloak/ckserver.json "AS_ROOT"
 sudo cp "$CURRENT_DIRECTORY/configs/cloak-server.service" /etc/systemd/system/cloak-server.service
 sudo systemctl daemon-reload
 sudo systemctl enable cloak-server.service
