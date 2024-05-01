@@ -32,3 +32,25 @@ cp "$CURRENT_DIRECTORY/configs/openvpn_client_base.conf" "/home/$USER/client-con
 substitute_variables "/home/$USER/client-configs/openvpn_client_base.conf"
 
 sudo cp "$CURRENT_DIRECTORY/configs/openvpn_server.con" /etc/openvpn/server/server.conf
+
+sudo sed -i 's/#net.ipv4.ip_forward = 1/net.ipv4.ip_forward = 1/g' /etc/sysctl.conf
+sudo sysctl -p
+
+sudo bash -c 'cat << EndOfText >> /etc/ufw/before.rules
+# START OPENVPN RULES
+# NAT table rules
+*nat
+:POSTROUTING ACCEPT [0:0]
+# Allow traffic from OpenVPN client to $NETWORK_INTERFACE
+-A POSTROUTING -s 10.8.0.0/8 -o $NETWORK_INTERFACE -j MASQUERADE
+COMMIT
+# END OPENVPN RULES
+EndOfText'
+
+sudo sed -i 's/DEFAULT_FORWARD_POLICY="DISCARD"/DEFAULT_FORWARD_POLICY="ACCEPT"/g' /etc/default/ufw
+
+sudo ufw allow OpenSSH
+sudo ufw allow 443
+
+sudo systemctl -f enable openvpn-server@server.service
+sudo systemctl start openvpn-server@server.service
