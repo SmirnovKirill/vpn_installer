@@ -33,6 +33,7 @@ sudo cp "/home/$USER/easy-rsa/ta.key" /etc/openvpn/server
 mkdir -p "/home/$USER/client-configs/keys"
 mkdir -p "/home/$USER/client-configs/files"
 cp -a "$CURRENT_DIRECTORY/configs/client/." "/home/$USER/client-configs"
+cp -a "$CURRENT_DIRECTORY/scripts/make_client_config.py" "/home/$USER/client-configs"
 sudo cp "/home/$USER/easy-rsa/ta.key" "/home/$USER/client-configs/keys"
 sudo cp "/home/$USER/easy-rsa/pki/ca.crt" "/home/$USER/client-configs/keys"
 sudo chown $USER "/home/$USER/client-configs/keys/ta.key"
@@ -72,9 +73,12 @@ sudo mv "/home/$USER/ck-server" /usr/bin/ck-server
 read CK_SERVER_PUBLIC_KEY CK_SERVER_PRIVATE_KEY <<< $(/usr/bin/ck-server -key | awk -F ":" '{print $2}' | sed -e $SED_COLOR_CODES_REPLACE | sed 's/ //g' | tr '\n' ' ')
 read CK_CLIENT_ADMIN_UID <<< $(/usr/bin/ck-server -uid | awk -F ":" '{print $2}' | sed -e $SED_COLOR_CODES_REPLACE | sed 's/ //g')
 
-substitute_variables "/home/$USER/client-configs/amnezia_template.json"
-substitute_variables "/home/$USER/client-configs/template_openvpn.conf"
+substitute_variables "/home/$USER/client-configs/template_amnezia.json"
+substitute_variables "/home/$USER/client-configs/template_amnezia_backup.json"
+substitute_variables "/home/$USER/client-configs/template_amnezia_openvpn.json"
 substitute_variables "/home/$USER/client-configs/template_cloak.json"
+substitute_variables "/home/$USER/client-configs/template_openvpn.conf"
+substitute_variables "/home/$USER/client-configs/template_shadowsocks.conf"
 
 sudo mkdir /etc/cloak
 sudo cp "$CURRENT_DIRECTORY/configs/ckserver.json" /etc/cloak/ckserver.json

@@ -1,0 +1,7 @@
+{
+  "Conf/appLanguage": null,
+  "Conf/appsRouteMode": "2",
+  "Conf/routeMode": "1",
+  "Servers/defaultServerIndex": 0,
+  "Servers/serversList": "[$AMNEZIA_CONFIG_ESCAPED]"
+}

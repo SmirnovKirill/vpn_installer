@@ -15,20 +15,20 @@ def main():
     print(openvpn_config)
     print("openvpn config end")
 
-    amnezia_openvpn_config = generate_amnezia_openvpn_config(openvpn_config, home_dir)
-    print("amnezia openvpn config:")
-    print(amnezia_openvpn_config)
-    print("amnezia openvpn config end")
-
     cloak_config = generate_cloak_config(home_dir)
     print("cloak config:")
     print(cloak_config)
     print("cloak config end")
 
-    amnezia_config = generate_amnezia_config(amnezia_openvpn_config, cloak_config, home_dir)
-    print("amnezia config:")
+    shadowsocks_config = generate_shadowsocks_config(home_dir)
+    print("shadowsocks config:")
+    print(shadowsocks_config)
+    print("shadowsocks config end")
+
+    amnezia_config = generate_amnezia_config(openvpn_config, cloak_config, shadowsocks_config, home_dir)
+    print("amnezia full config:")
     print(amnezia_config)
-    print("amnezia config end")
+    print("amnezia full config end")
 
 
 def get_validated_pofile_name():
@@ -77,15 +77,6 @@ def generate_openvpn_config(home_dir, profile_name):
     )
 
 
-def generate_amnezia_openvpn_config(openvpn_config, home_dir):
-    amnezia_openvpn_config = Path(f"{home_dir}/client-configs/template_amnezia_openvpn.json").read_text()
-    amnezia_openvpn_config = amnezia_openvpn_config.replace(
-        "$OPENVPN_CLIENT_CONFIG_ESCAPED",
-        openvpn_config.replace("\n", "\\\\n").replace("\"", "\\\"")
-    )
-    return amnezia_openvpn_config
-
-
 def generate_cloak_config(home_dir):
     cloak_uid = run_command('/usr/bin/ck-server -uid', capture_output=True)
     cloak_uid = cloak_uid.split()[-1].replace("\n", "")
@@ -93,20 +84,29 @@ def generate_cloak_config(home_dir):
     return cloak_config.replace("$CK_USER_UID", cloak_uid)
 
 
-def generate_amnezia_config(amnezia_openvpn_config, cloak_config, home_dir):
+def generate_shadowsocks_config(home_dir):
+    return Path(f"{home_dir}/client-configs/template_shadowsocks.json").read_text()
+
+
+def generate_amnezia_config(openvpn_config, cloak_config, shadowsocks_config, home_dir):
+    openvpn_config_escaped = openvpn_config.replace("\n", "\\n").replace("\"", "\\\"").replace("\\", "\\\\\\\\")
+    cloak_config_escaped = cloak_config.replace("\n", "\\\\\\n").replace("\"", "\\\\\\\"")
+    shadowsocks_config_escaped = shadowsocks_config.replace("\n", "\\\\\\n").replace("\"", "\\\\\\\"")
+
+    amnezia_openvpn_config = Path(f"{home_dir}/client-configs/template_amnezia_openvpn.json").read_text()
+    amnezia_openvpn_config = amnezia_openvpn_config.replace("\n", "\\\\\\n").replace("\"", "\\\\\\\"")
+    amnezia_openvpn_config = amnezia_openvpn_config.replace("$OPENVPN_CLIENT_CONFIG_ESCAPED", openvpn_config_escaped)
+
     amnezia_config = Path(f"{home_dir}/client-configs/template_amnezia.json").read_text()
-    amnezia_config = amnezia_config.replace(
-        "$AMNEZIA_OPENVPN_CLIENT_CONFIG_ESCAPED",
-        amnezia_openvpn_config
-        .replace("\\", "\\\\")
-        .replace("\n", "\\\\n")
-        .replace("\"", "\\\"")
-        .replace("\\\\\\", "\\\\\"")
-    )
-    return amnezia_config.replace(
-        "$CLOAK_CONFIG_ESCAPED",
-        cloak_config.replace("\n", "\\\\n").replace("\"", "\\\"")
-    )
+    amnezia_config = amnezia_config.replace("\n", "\\n").replace("\"", "\\\"")
+    amnezia_config = amnezia_config.replace("$AMNEZIA_OPENVPN_CLIENT_CONFIG_ESCAPED", amnezia_openvpn_config)
+    amnezia_config = amnezia_config.replace("$CLOAK_CONFIG_ESCAPED", cloak_config_escaped)
+    amnezia_config = amnezia_config.replace("$SHADOWSOCKS_CONFIG_ESCAPED", shadowsocks_config_escaped)
+
+    amnezia_backup_config = Path(f"{home_dir}/client-configs/template_amnezia_backup.json").read_text()
+    amnezia_backup_config = amnezia_backup_config.replace("$AMNEZIA_CONFIG_ESCAPED", amnezia_config)
+
+    return amnezia_backup_config
 
 
 if __name__ == "__main__":
