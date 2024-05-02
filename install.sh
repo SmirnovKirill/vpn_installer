@@ -32,13 +32,11 @@ sudo cp "/home/$USER/easy-rsa/ta.key" /etc/openvpn/server
 
 mkdir -p "/home/$USER/client-configs/keys"
 mkdir -p "/home/$USER/client-configs/files"
-cp "$CURRENT_DIRECTORY/configs/client/*" "/home/$USER/client-configs"
+cp -a "$CURRENT_DIRECTORY/configs/client/." "/home/$USER/client-configs"
 sudo cp "/home/$USER/easy-rsa/ta.key" "/home/$USER/client-configs/keys"
 sudo cp "/home/$USER/easy-rsa/pki/ca.crt" "/home/$USER/client-configs/keys"
 sudo chown $USER "/home/$USER/client-configs/keys/ta.key"
 sudo chown $USER "/home/$USER/client-configs/keys/ca.crt"
-OPENVPN_CA_CERT=$(cat "$HOME/client-configs/keys/ca.crt")
-OPENVPN_TA_KEY=$(cat "$HOME/client-configs/keys/ta.key")
 
 sudo cp "$CURRENT_DIRECTORY/configs/openvpn_server.conf" /etc/openvpn/server/server.conf
 

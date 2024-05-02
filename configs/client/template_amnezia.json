@@ -3,10 +3,10 @@
     {
       "container": "amnezia-openvpn-cloak",
       "openvpn": {
-        "last_config": "{\n    \"clientId\": \"clientId\",\n    \"config\": \"$OPENVPN_CLIENT_CONFIG_ESCAPED\"}\n"
+        "last_config": "$AMNEZIA_OPENVPN_CLIENT_CONFIG_ESCAPED"
       },
       "cloak": {
-        "last_config": "{\n    \"BrowserSig\": \"chrome\",\n    \"EncryptionMethod\": \"aes-gcm\",\n    \"NumConn\": 1,\n    \"ProxyMethod\": \"openvpn\",\n    \"PublicKey\": \"$CK_SERVER_PUBLIC_KEY\",\n    \"RemoteHost\": \"$VPS_IP\",\n    \"RemotePort\": \"443\",\n    \"ServerName\": \"$CLOAK_FAKE_HOST\",\n    \"StreamTimeout\": 300,\n    \"Transport\": \"direct\",\n    \"UID\": \"$CK_CLIENT_USER_UID\"\n}\n",
+        "last_config": "$CLOAK_CONFIG_ESCAPED",
         "port": "443",
         "transport_proto": "tcp"
       },

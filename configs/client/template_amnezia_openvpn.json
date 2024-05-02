@@ -1,0 +1,4 @@
+{
+  "clientId": "clientId",
+  "config": "$OPENVPN_CLIENT_CONFIG_ESCAPED"
+}
