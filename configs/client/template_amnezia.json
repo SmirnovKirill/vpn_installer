@@ -1,14 +1,14 @@
 {
   "containers": [
     {
-      "container": "amnezia-openvpn-cloak",
-      "openvpn": {
-        "last_config": "$AMNEZIA_OPENVPN_CLIENT_CONFIG_ESCAPED"
-      },
       "cloak": {
         "last_config": "$CLOAK_CONFIG_ESCAPED",
         "port": "443",
         "transport_proto": "tcp"
+      },
+      "container": "amnezia-openvpn-cloak",
+      "openvpn": {
+        "last_config": "$AMNEZIA_OPENVPN_CLIENT_CONFIG_ESCAPED"
       },
       "shadowsocks": {
         "last_config": "$SHADOWSOCKS_CONFIG_ESCAPED"

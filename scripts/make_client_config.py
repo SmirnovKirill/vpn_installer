@@ -32,9 +32,11 @@ def main():
     print(amnezia_config)
     print("amnezia full config end")
 
+    cloak_uid_escaped = cloak_uid.replace("/", "\\/");
     run_command(
-        f"sudo sed -i 's/\"BypassUID\": \\[/\"BypassUID\": [\\n    \"{cloak_uid}\",/g' /etc/cloak/ckserver.json"
+        f"sudo sed -i 's/\"BypassUID\": \\[/\"BypassUID\": [\\n    \"{cloak_uid_escaped}\",/g' /etc/cloak/ckserver.json"
     )
+    run_command(f"sudo sed -i 's/,\\n\\[/\\n\\[/g' /etc/cloak/ckserver.json")
     run_command("sudo systemctl daemon-reload")
     run_command("sudo systemctl restart cloak-server.service")
 
@@ -96,11 +98,11 @@ def generate_shadowsocks_config(home_dir):
 
 def generate_amnezia_config(openvpn_config, cloak_config, shadowsocks_config, profile_name, home_dir):
     openvpn_config_escaped = openvpn_config.replace("\n", "\\n").replace("\"", "\\\"").replace("\\", "\\\\\\\\")
-    cloak_config_escaped = cloak_config.replace("\n", "\\\\\\n").replace("\"", "\\\\\\\"")
-    shadowsocks_config_escaped = shadowsocks_config.replace("\n", "\\\\\\n").replace("\"", "\\\\\\\"")
+    cloak_config_escaped = cloak_config.replace("\n", "\\\\n").replace("\"", "\\\\\\\"")
+    shadowsocks_config_escaped = shadowsocks_config.replace("\n", "\\\\n").replace("\"", "\\\\\\\"")
 
     amnezia_openvpn_config = Path(f"{home_dir}/client-configs/template_amnezia_openvpn.json").read_text()
-    amnezia_openvpn_config = amnezia_openvpn_config.replace("\n", "\\\\\\n").replace("\"", "\\\\\\\"")
+    amnezia_openvpn_config = amnezia_openvpn_config.replace("\n", "\\\\n").replace("\"", "\\\\\\\"")
     amnezia_openvpn_config = amnezia_openvpn_config.replace("$OPENVPN_CLIENT_CONFIG_ESCAPED", openvpn_config_escaped)
 
     amnezia_config = Path(f"{home_dir}/client-configs/template_amnezia.json").read_text()
