@@ -25,6 +25,11 @@ def main():
     print(cloak_config)
     print("cloak config end")
 
+    amnezia_config = generate_amnezia_config(amnezia_openvpn_config, cloak_config, home_dir)
+    print("amnezia config:")
+    print(amnezia_config)
+    print("amnezia config end")
+
 
 def get_validated_pofile_name():
     if len(sys.argv) < 2:
@@ -76,7 +81,7 @@ def generate_amnezia_openvpn_config(openvpn_config, home_dir):
     amnezia_openvpn_config = Path(f"{home_dir}/client-configs/template_amnezia_openvpn.json").read_text()
     amnezia_openvpn_config = amnezia_openvpn_config.replace(
         "$OPENVPN_CLIENT_CONFIG_ESCAPED",
-        openvpn_config.replace("\n", "\\n").replace("\"", "\\\"")
+        openvpn_config.replace("\n", "\\\\n").replace("\"", "\\\"")
     )
     return amnezia_openvpn_config
 
@@ -86,6 +91,22 @@ def generate_cloak_config(home_dir):
     cloak_uid = cloak_uid.split()[-1].replace("\n", "")
     cloak_config = Path(f"{home_dir}/client-configs/template_cloak.json").read_text()
     return cloak_config.replace("$CK_USER_UID", cloak_uid)
+
+
+def generate_amnezia_config(amnezia_openvpn_config, cloak_config, home_dir):
+    amnezia_config = Path(f"{home_dir}/client-configs/template_amnezia.json").read_text()
+    amnezia_config = amnezia_config.replace(
+        "$AMNEZIA_OPENVPN_CLIENT_CONFIG_ESCAPED",
+        amnezia_openvpn_config
+        .replace("\\", "\\\\")
+        .replace("\n", "\\\\n")
+        .replace("\"", "\\\"")
+        .replace("\\\\\\", "\\\\\"")
+    )
+    return amnezia_config.replace(
+        "$CLOAK_CONFIG_ESCAPED",
+        cloak_config.replace("\n", "\\\\n").replace("\"", "\\\"")
+    )
 
 
 if __name__ == "__main__":
