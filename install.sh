@@ -78,7 +78,7 @@ substitute_variables "/home/$USER/client-configs/template_amnezia_backup.json"
 substitute_variables "/home/$USER/client-configs/template_amnezia_openvpn.json"
 substitute_variables "/home/$USER/client-configs/template_cloak.json"
 substitute_variables "/home/$USER/client-configs/template_openvpn.conf"
-substitute_variables "/home/$USER/client-configs/template_shadowsocks.conf"
+substitute_variables "/home/$USER/client-configs/template_shadowsocks.json"
 
 sudo mkdir /etc/cloak
 sudo cp "$CURRENT_DIRECTORY/configs/ckserver.json" /etc/cloak/ckserver.json

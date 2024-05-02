@@ -25,7 +25,7 @@ def main():
     print(shadowsocks_config)
     print("shadowsocks config end")
 
-    amnezia_config = generate_amnezia_config(openvpn_config, cloak_config, shadowsocks_config, home_dir)
+    amnezia_config = generate_amnezia_config(openvpn_config, cloak_config, shadowsocks_config, profile_name, home_dir)
     print("amnezia full config:")
     print(amnezia_config)
     print("amnezia full config end")
@@ -88,7 +88,7 @@ def generate_shadowsocks_config(home_dir):
     return Path(f"{home_dir}/client-configs/template_shadowsocks.json").read_text()
 
 
-def generate_amnezia_config(openvpn_config, cloak_config, shadowsocks_config, home_dir):
+def generate_amnezia_config(openvpn_config, cloak_config, shadowsocks_config, profile_name, home_dir):
     openvpn_config_escaped = openvpn_config.replace("\n", "\\n").replace("\"", "\\\"").replace("\\", "\\\\\\\\")
     cloak_config_escaped = cloak_config.replace("\n", "\\\\\\n").replace("\"", "\\\\\\\"")
     shadowsocks_config_escaped = shadowsocks_config.replace("\n", "\\\\\\n").replace("\"", "\\\\\\\"")
@@ -105,6 +105,7 @@ def generate_amnezia_config(openvpn_config, cloak_config, shadowsocks_config, ho
 
     amnezia_backup_config = Path(f"{home_dir}/client-configs/template_amnezia_backup.json").read_text()
     amnezia_backup_config = amnezia_backup_config.replace("$AMNEZIA_CONFIG_ESCAPED", amnezia_config)
+    amnezia_backup_config = amnezia_backup_config.replace("$AMNEZIA_CONTAINER_NAME", profile_name)
 
     return amnezia_backup_config
 
