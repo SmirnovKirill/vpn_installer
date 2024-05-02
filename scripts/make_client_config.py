@@ -15,7 +15,9 @@ def main():
     print(openvpn_config)
     print("openvpn config end")
 
-    cloak_config = generate_cloak_config(home_dir)
+    cloak_uid = run_command('/usr/bin/ck-server -uid', capture_output=True)
+    cloak_uid = cloak_uid.split()[-1].replace("\n", "")
+    cloak_config = generate_cloak_config(cloak_uid, home_dir)
     print("cloak config:")
     print(cloak_config)
     print("cloak config end")
@@ -29,6 +31,12 @@ def main():
     print("amnezia full config:")
     print(amnezia_config)
     print("amnezia full config end")
+
+    run_command(
+        f"sudo sed -i 's/\"BypassUID\": \\[/\"BypassUID\": [\\n    \"{cloak_uid}\",/g' /etc/cloak/ckserver.json"
+    )
+    run_command("sudo systemctl daemon-reload")
+    run_command("sudo systemctl restart cloak-server.service")
 
 
 def get_validated_pofile_name():
@@ -77,9 +85,7 @@ def generate_openvpn_config(home_dir, profile_name):
     )
 
 
-def generate_cloak_config(home_dir):
-    cloak_uid = run_command('/usr/bin/ck-server -uid', capture_output=True)
-    cloak_uid = cloak_uid.split()[-1].replace("\n", "")
+def generate_cloak_config(cloak_uid, home_dir):
     cloak_config = Path(f"{home_dir}/client-configs/template_cloak.json").read_text()
     return cloak_config.replace("$CK_USER_UID", cloak_uid)
 
