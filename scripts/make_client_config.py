@@ -32,7 +32,7 @@ def main():
     print(amnezia_config)
     print("amnezia full config end")
 
-    cloak_uid_escaped = cloak_uid.replace("/", "\\/");
+    cloak_uid_escaped = cloak_uid.replace("/", "\\/")
     run_command(
         f"sudo sed -i 's/\"BypassUID\": \\[/\"BypassUID\": [\\n    \"{cloak_uid_escaped}\",/g' /etc/cloak/ckserver.json"
     )
