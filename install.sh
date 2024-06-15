@@ -13,11 +13,10 @@ source "$CURRENT_DIRECTORY/constants.sh"
 sudo apt update
 sudo apt install openvpn easy-rsa squid apache2-utils
 
-cat "Enter password for squid user $SQUID_NAME"
+echo "Enter password for squid user $SQUID_NAME"
 sudo htpasswd -c /etc/squid/passwords $SQUID_NAME
 
-sudo sed -i 's#include /etc/squid/conf.d/\*#include /etc/squid/conf.d/*\nauth_param basic program /usr/lib/squid/basic_ncsa_auth /etc/squid/passwords\nauth_param basic realm proxy\nacl authenticated proxy_auth REQUIRED#g' /etc/squid/squid.conf
-sudo sed -i 's#http_access allow localhost$#http_access allow localhost\nhttp_access allow authenticated#g' /etc/squid/squid.conf
+sudo sed -i 's#include /etc/squid/conf.d/\*#include /etc/squid/conf.d/*\nauth_param basic program /usr/lib/squid/basic_ncsa_auth /etc/squid/passwords\nauth_param basic realm proxy\nacl authenticated proxy_auth REQUIRED\nhttp_access allow authenticated#g' /etc/squid/squid.conf
 
 mkdir "/home/$USER/easy-rsa"
 cp "$CURRENT_DIRECTORY/configs/easy_rsa_vars" "/home/$USER/easy-rsa/vars"
